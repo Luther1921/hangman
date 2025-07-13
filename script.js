@@ -148,22 +148,23 @@ function updateVolume(isMuted) {
   Object.values(sounds).forEach((audio) => {
     audio.muted = isMuted;
   });
-  muteBtn.textContent = isMuted ? "🔊 Unmute" : "🔇 Mute";
+  const volumeToSave = isMuted ? 0 : 0.3;
+  localStorage.setItem("volume", volumeToSave.toString());
+  muteBtn.textContent = isMuted ? "🔊" : "🔇";
 }
 
-updateVolume(defaultVolume);
-
+updateVolume(defaultVolume === 0);
 sounds.bg.loop = true;
 sounds.bg.muted = true;
 sounds.bg.volume = defaultVolume;
-muteBtn.textContent = "🔊 Unmute";
+muteBtn.textContent = "🔊";
 
 document.addEventListener(
   "pointerdown",
   () => {
     sounds.bg.muted = false;
     sounds.bg.play().catch((e) => console.warn("Autoplay still blocked:", e));
-    muteBtn.textContent = "🔇 Mute";
+    muteBtn.textContent = "🔇";
   },
   { once: true }
 );

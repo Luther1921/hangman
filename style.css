@@ -203,7 +203,7 @@ h1 {
   top: 12px;
   right: 12px;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   background-color: rgba(30, 30, 30, 0.75);
   padding: 6px 10px;
@@ -326,22 +326,22 @@ h1 {
   }
 
   #audio-controls {
-    top: 12px;
-    right: 12px;
-    padding: 6px 10px;
+    top: 10px;
+    right: 10px;
+    padding: 4px 6px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 10px;
     flex-direction: row;
     gap: 6px;
   }
   #muteBtn,
   #viewLeaderboardBtn {
-    font-size: 14px;
-    padding: 6px 10px;
+    font-size: 10px;
+    padding: 4px 6px;
   }
 
   #keyboard button {
-    font-size: 16px;
+    font-size: 11px;
     padding: 8px 12px;
   }
 
@@ -446,4 +446,20 @@ h1 {
 .toast.show {
   opacity: 1;
   bottom: 50px;
+}
+
+#viewLeaderboardBtn {
+  font-size: 12px;
+  padding: 6px 10px;
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+#viewLeaderboardBtn:hover {
+  background-color: #fff;
+  color: #000;
 }
