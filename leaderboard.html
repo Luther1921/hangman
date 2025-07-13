@@ -174,7 +174,7 @@
 
       async function loadLeaderboard() {
         const ref = collection(db, "leaderboard");
-        const q = query(ref, orderBy("score", "desc"), limit(10));
+        const q = query(ref, orderBy("score", "desc"), limit(15));
         const snapshot = await getDocs(q);
         const tbody = document.querySelector("#leaderboardTable tbody");
         tbody.innerHTML = "";

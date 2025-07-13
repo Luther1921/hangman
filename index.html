@@ -67,6 +67,20 @@
         pointer-events: none;
       "
     ></canvas>
+    <!-- Leaderboard Name Modal -->
+    <div id="nameModal" class="modal">
+      <div class="modal-content">
+        <h3>🏆 Submit Your Score</h3>
+        <p>Enter your name for the leaderboard:</p>
+        <input type="text" id="playerNameInput" placeholder="Your name..." />
+        <div class="modal-buttons">
+          <button id="submitNameBtn">Submit</button>
+          <button id="cancelNameBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast">✅ Your score has been saved!</div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>

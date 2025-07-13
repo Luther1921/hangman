@@ -127,10 +127,9 @@ const messageDiv = document.getElementById("message");
 const hintDiv = document.getElementById("hint");
 const canvas = document.getElementById("hangmanCanvas");
 const ctx = canvas.getContext("2d");
-const volumeSlider = document.getElementById("volume");
-const muteBtn = document.getElementById("muteBtn");
 const highScoreDisplay = document.getElementById("highScoreDisplay");
 
+// ----- Audio Setup -----
 const sounds = {
   correct: new Audio("sounds/correct.mp3"),
   wrong: new Audio("sounds/wrong.mp3"),
@@ -139,28 +138,58 @@ const sounds = {
   bg: new Audio("sounds/bg-music2.mp3"),
 };
 
+// Load saved volume or default to 0.3
 const savedVolume = parseFloat(localStorage.getItem("volume"));
 const defaultVolume = isNaN(savedVolume) ? 0.3 : savedVolume;
 
-sounds.bg.loop = true;
-sounds.bg.volume = defaultVolume;
-sounds.bg.muted = true;
-sounds.bg.play().catch(() => {
-  console.log("Autoplay blocked. Will unmute on user interaction.");
-});
+const volumeSlider = document.getElementById("volume");
+const muteBtn = document.getElementById("muteBtn");
+volumeSlider.value = defaultVolume;
 
-function enableMusicPlayback() {
-  sounds.bg.muted = false;
-  sounds.bg.play().catch((e) => {
-    console.warn("Still blocked:", e);
+function updateVolume(vol) {
+  Object.values(sounds).forEach((audio) => {
+    audio.volume = vol;
+    audio.muted = vol === 0;
   });
-  document.removeEventListener("pointerdown", enableMusicPlayback);
+  muteBtn.textContent = vol === 0 ? "🔊 Unmute" : "🔇 Mute";
 }
 
-document.addEventListener("pointerdown", enableMusicPlayback);
-
-volumeSlider.value = defaultVolume;
 updateVolume(defaultVolume);
+
+sounds.bg.loop = true;
+sounds.bg.muted = true;
+sounds.bg.volume = defaultVolume;
+
+document.addEventListener(
+  "pointerdown",
+  () => {
+    sounds.bg.muted = false;
+    sounds.bg.play().catch((e) => console.warn("Autoplay still blocked:", e));
+  },
+  { once: true }
+);
+
+// Volume slider handler
+volumeSlider.addEventListener("input", (e) => {
+  const vol = parseFloat(e.target.value);
+  updateVolume(vol);
+  localStorage.setItem("volume", vol.toString());
+});
+
+// Mute/unmute toggle
+muteBtn.addEventListener("click", () => {
+  const isMuted = sounds.bg.muted || sounds.bg.volume === 0;
+
+  if (isMuted) {
+    const vol = parseFloat(volumeSlider.value) || 0.3;
+    updateVolume(vol);
+    sounds.bg.muted = false;
+    sounds.bg.play().catch(console.warn);
+  } else {
+    updateVolume(0);
+    sounds.bg.muted = true;
+  }
+});
 
 const faceOptionsDiv = document.getElementById("faceOptions");
 const gameArea = document.getElementById("gameArea");
@@ -383,6 +412,15 @@ function guess(letter) {
   });
 }
 
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
+
 function checkWin() {
   const won = selectedWord
     .split("")
@@ -421,18 +459,17 @@ function endGame(won) {
 
   if (won && remainingQuestions.length === 0) {
     messageDiv.innerHTML = `
-    🎉 You completed all ${wordsWithHints.length} questions!<br>
-    🥳 Win Streak: ${winStreak}<br>
-    
-  `;
+      🎉 You completed all ${wordsWithHints.length} questions!<br>
+      🥳 Win Streak: ${winStreak}<br>
+    `;
     sounds.win.play();
     confetti();
 
     document.getElementById("shareBtn").style.display = "inline-block";
 
     if (winStreak > 0) {
-      const name = prompt("Enter your name for the leaderboard:");
-      if (name) saveScore(name, winStreak);
+      const scoreToSave = winStreak;
+      showLeaderboardModal((name) => saveScore(name, scoreToSave));
     }
 
     return;
@@ -447,9 +484,10 @@ function endGame(won) {
   document.getElementById("shareBtn").style.display = "inline-block";
 
   if (winStreak > 0) {
-    const name = prompt("Enter your name for the leaderboard:");
-    if (name) saveScore(name, winStreak);
+    const scoreToSave = winStreak;
+    showLeaderboardModal((name) => saveScore(name, scoreToSave));
   }
+
   checkAndUnlockFaces();
   winStreak = 0;
   updateHighScoreDisplay();
@@ -483,33 +521,17 @@ function startNewWord() {
 }
 
 function restartGame() {
-  // winStreak = 0;
+  winStreak = 0;
   remainingQuestions = [...wordsWithHints];
   updateHighScoreDisplay();
   startNewWord();
 }
 
-function updateVolume(vol) {
-  Object.values(sounds).forEach((audio) => (audio.volume = vol));
-}
-
-volumeSlider.addEventListener("input", (e) => {
-  const vol = parseFloat(e.target.value);
-  updateVolume(vol);
-  localStorage.setItem("volume", vol);
-  muteBtn.textContent = vol === 0 ? "🔊 Unmute" : "🔇 Mute";
-});
-
-muteBtn.addEventListener("click", () => {
-  const isMuted = sounds.bg.volume > 0;
-  updateVolume(isMuted ? 0 : parseFloat(volumeSlider.value) || 1);
-  muteBtn.textContent = isMuted ? "🔊 Unmute" : "🔇 Mute";
-});
-
 async function saveScore(name, score) {
   const ref = firestore.collection(db, "leaderboard");
   try {
     await firestore.addDoc(ref, { name, score, timestamp: Date.now() });
+    showToast("✅ Your score has been saved!");
     loadLeaderboard();
   } catch (e) {
     console.error("Error saving score:", e);
@@ -587,7 +609,7 @@ document.getElementById("shareBtn").addEventListener("click", () => {
   const tweetText = `I just survived ${winStreak} faces in this wild hangman game 🎯😈
 Think you can beat my streak?
 
-Play here 👉 [YOUR_GAME_URL]
+Play here 👉 ${window.location.origin}
 
 #Hangman #SuccinctLabs`;
 
@@ -596,6 +618,31 @@ Play here 👉 [YOUR_GAME_URL]
   )}`;
   window.open(twitterUrl, "_blank");
 });
+const leaderboardModal = document.getElementById("nameModal");
+const leaderboardInput = document.getElementById("playerNameInput");
+const submitBtn = document.getElementById("submitNameBtn");
+const cancelBtn = document.getElementById("cancelNameBtn");
+
+function showLeaderboardModal(callback) {
+  leaderboardModal.style.display = "flex";
+  leaderboardInput.value = "";
+  leaderboardInput.focus();
+
+  const submitHandler = () => {
+    const name = leaderboardInput.value.trim();
+    if (name) {
+      leaderboardModal.style.display = "none";
+      callback(name);
+    }
+  };
+
+  const cancelHandler = () => {
+    leaderboardModal.style.display = "none";
+  };
+
+  submitBtn.onclick = submitHandler;
+  cancelBtn.onclick = cancelHandler;
+}
 
 setTimeout(() => {
   updateHighScoreDisplay();
