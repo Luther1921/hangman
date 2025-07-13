@@ -142,16 +142,13 @@ const sounds = {
 const savedVolume = parseFloat(localStorage.getItem("volume"));
 const defaultVolume = isNaN(savedVolume) ? 0.3 : savedVolume;
 
-const volumeSlider = document.getElementById("volume");
 const muteBtn = document.getElementById("muteBtn");
-volumeSlider.value = defaultVolume;
 
-function updateVolume(vol) {
+function updateVolume(isMuted) {
   Object.values(sounds).forEach((audio) => {
-    audio.volume = vol;
-    audio.muted = vol === 0;
+    audio.muted = isMuted;
   });
-  muteBtn.textContent = vol === 0 ? "🔊 Unmute" : "🔇 Mute";
+  muteBtn.textContent = isMuted ? "🔊 Unmute" : "🔇 Mute";
 }
 
 updateVolume(defaultVolume);
@@ -159,36 +156,22 @@ updateVolume(defaultVolume);
 sounds.bg.loop = true;
 sounds.bg.muted = true;
 sounds.bg.volume = defaultVolume;
+muteBtn.textContent = "🔊 Unmute";
 
 document.addEventListener(
   "pointerdown",
   () => {
     sounds.bg.muted = false;
     sounds.bg.play().catch((e) => console.warn("Autoplay still blocked:", e));
+    muteBtn.textContent = "🔇 Mute";
   },
   { once: true }
 );
 
-// Volume slider handler
-volumeSlider.addEventListener("input", (e) => {
-  const vol = parseFloat(e.target.value);
-  updateVolume(vol);
-  localStorage.setItem("volume", vol.toString());
-});
-
 // Mute/unmute toggle
 muteBtn.addEventListener("click", () => {
-  const isMuted = sounds.bg.muted || sounds.bg.volume === 0;
-
-  if (isMuted) {
-    const vol = parseFloat(volumeSlider.value) || 0.3;
-    updateVolume(vol);
-    sounds.bg.muted = false;
-    sounds.bg.play().catch(console.warn);
-  } else {
-    updateVolume(0);
-    sounds.bg.muted = true;
-  }
+  const isMuted = sounds.bg.muted;
+  updateVolume(!isMuted);
 });
 
 const faceOptionsDiv = document.getElementById("faceOptions");
