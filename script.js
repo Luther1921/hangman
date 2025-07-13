@@ -144,18 +144,20 @@ const defaultVolume = isNaN(savedVolume) ? 0.3 : savedVolume;
 
 sounds.bg.loop = true;
 sounds.bg.volume = defaultVolume;
-
 sounds.bg.muted = true;
 sounds.bg.play().catch(() => {
   console.log("Autoplay blocked. Will unmute on user interaction.");
 });
 
-// Unmute on first interaction (click/tap)
-function unmuteMusic() {
+function enableMusicPlayback() {
   sounds.bg.muted = false;
-  document.removeEventListener("click", unmuteMusic);
+  sounds.bg.play().catch((e) => {
+    console.warn("Still blocked:", e);
+  });
+  document.removeEventListener("pointerdown", enableMusicPlayback);
 }
-document.addEventListener("click", unmuteMusic);
+
+document.addEventListener("pointerdown", enableMusicPlayback);
 
 volumeSlider.value = defaultVolume;
 updateVolume(defaultVolume);
