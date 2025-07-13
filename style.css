@@ -202,6 +202,9 @@ h1 {
   position: absolute;
   top: 12px;
   right: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
   background-color: rgba(30, 30, 30, 0.75);
   padding: 6px 10px;
   border-radius: 10px;
@@ -210,13 +213,16 @@ h1 {
   z-index: 1000;
 }
 
+/* Mute Button */
 #muteBtn {
-  font-size: 16px;
+  font-size: 14px;
   background: none;
   border: none;
   color: #fff;
   cursor: pointer;
   transition: transform 0.2s, color 0.2s;
+  padding: 4px 8px;
+  white-space: nowrap;
 }
 
 #muteBtn:hover {
@@ -325,6 +331,8 @@ h1 {
     padding: 6px 10px;
     border-radius: 10px;
     font-size: 14px;
+    flex-direction: column;
+    align-items: flex-end;
   }
 
   #muteBtn {
