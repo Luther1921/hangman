@@ -88,39 +88,24 @@ faceImages.forEach((face) => {
 });
 
 const wordsWithHints = [
+  { word: "myntusd", hint: "Succinct’s stablecoin partner for ZK innovation" },
   {
-    word: "proof",
-    hint: "The cryptographic evidence that a statement is true",
+    word: "zkbridge",
+    hint: "Sends messages between chains using zero-knowledge proofs",
   },
   {
-    word: "succinct",
-    hint: "The community pushing zk scaling forward — one proof at a time",
+    word: "opstack",
+    hint: "The modular rollup framework that SP1 integrates with",
   },
+  { word: "recursive", hint: "A type of proof that can verify another proof" },
+  { word: "blobs", hint: "Data containers used in rollups and danksharding" },
+  { word: "sasha", hint: "Addy's name on discord" },
+  { word: "ethereum", hint: "The base layer many ZK systems are built on" },
+  { word: "eclair", hint: "The testnet powered by SP1, OP Stack, and EigenDA" },
+  { word: "sequencer", hint: "Orders transactions in a rollup" },
   {
-    word: "rollup",
-    hint: "A scaling solution that executes off-chain and posts proofs on-chain",
-  },
-  { word: "zkpdf", hint: "Succinct’s private document verification tool" },
-  {
-    word: "github",
-    hint: "Home of open-source code, including Succinct’s tools",
-  },
-  { word: "rpc", hint: "Interface used to talk to blockchain nodes" },
-  {
-    word: "lite",
-    hint: "Succinct's zkVM-based prover that's extremely lightweight",
-  },
-  {
-    word: "zkvm",
-    hint: "A virtual machine that runs programs and proves them with ZK",
-  },
-  {
-    word: "openzk",
-    hint: "Succinct’s community hub for builders and ZK learners",
-  },
-  {
-    word: "prover",
-    hint: "The machine that generates zero-knowledge proofs",
+    word: "latency",
+    hint: "Succinct's prover network aims to reduce this for proof generation",
   },
 ];
 
